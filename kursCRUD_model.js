@@ -65,7 +65,6 @@ kursCRUD_model.delete("/:id", async (req, res) => {
 // hol die daten von kurses
 kursCRUD_model.get("", async (req, res) => {
   try {
-
     const abfrage = `
     SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id;`;
     var erg2 = await pool.query(abfrage);
@@ -81,25 +80,6 @@ kursCRUD_model.get("", async (req, res) => {
 });
 
 module.exports = kursCRUD_model;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // const express = require('express');
 // const axios = require('axios');
