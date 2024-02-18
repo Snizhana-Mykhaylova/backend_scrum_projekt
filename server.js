@@ -3,7 +3,7 @@ const server = express();
 const port = 5500;
 server.use(express.json());
 var cors = require("cors");
-const pool =require("./VSS_DatabaseConnect")
+const pool = require("./VSS_DatabaseConnect");
 
 server.use(
   cors({
@@ -14,7 +14,6 @@ server.use(
 );
 
 //***********************************************************************TEILNEHMER********************************************************************* */
-
 
 // damit kann man die teilnehmer an ein kurs hinhügen mitPOST dutch id  =>  http://localhost:5500/add_TN_teilnehmer_intoBuchungen/5
 // const add_TN = require("./teilnehmerCRUD_model");
@@ -36,20 +35,14 @@ server.use("/update_TN", update_TN);
 const delete_TN = require("./teilnehmerCRUD_model");
 server.use("/delete_tn", delete_TN);
 
-
 //teilnehmer einzel info durch id aufrufen
 const teilnehemr_einzel = require("./teilnehmerCRUD_model");
 server.use("/teilnehemr_einzel", teilnehemr_einzel);
 
-
 // hier mit kann man ein teilnehemr in ein gebuchte kurs hinfügen mit PUT bitte    =>     http://localhost:5500/insert_tn_buchung/7/48
-const tn_buchung =require("./teilnehmerCRUD_model");
-server.use("/insert_tn_buchung" ,tn_buchung)
+const tn_buchung = require("./teilnehmerCRUD_model");
+server.use("/insert_tn_buchung", tn_buchung);
 //******************************************************************************************************************************************** */
-
-
-
-
 
 //***********************************************************************MITARBEITER********************************************************************* */
 
@@ -93,10 +86,9 @@ server.use("/delete_dozent", delete_dozent);
 const dozent_zum_Buchung_insert = require("./dozentenCRUD_model");
 server.use("/dozent_buchung", dozent_zum_Buchung_insert);
 
-
 // // mit mit kann mann dozent und sein kontakt daten aufrufun durch id   => http://localhost:5500/get_one_dozent/get_one/8
 const get_one = require("./dozentenCRUD_model");
-server.use("/get_one_dozent" , get_one)
+server.use("/get_one_dozent", get_one);
 
 //***********************************************************************KURS********************************************************************* */
 
@@ -116,10 +108,9 @@ server.use("/delete_kurs", delete_kurs);
 const getAll_kurs = require("./kursCRUD_model");
 server.use("/getAll_kurs", getAll_kurs);
 
-
 // insert kurs zum buchung                                  =>       http://localhost:5500/kurs_buchen
 const kurs_buchung = require("./kursCRUD_model");
-server.use("/kurs_buchen", kurs_buchung)
+server.use("/kurs_buchen", kurs_buchung);
 
 //******************************************************************************************************************************************** */
 
@@ -132,7 +123,6 @@ server.use("/", getUserLogin);
 const checkUndAddUsersingup = require("./login_controller");
 server.use("/", checkUndAddUsersingup);
 
-
 //******************************************************************************************************************************************** */
 
 server.listen(port, () => {
@@ -142,9 +132,8 @@ server.listen(port, () => {
 // npm i g-nodemon damit der server
 
 //******************************************************************************************************************************************** */
-// test aera 
+// test aera
 
-
-//hier mit kann mann die teilnehmer die ein bestimmte kurs besuchen rausf finden durch kurs id und prameter k_id =>  http://localhost:5500/getTN   http://localhost:5500/getTN?k_id=2      
-const get_tn_f_k =require("./teilnehmerCRUD_model");
-server.use("/getTN" , get_tn_f_k)
+//hier mit kann mann die teilnehmer die ein bestimmte kurs besuchen rausf finden durch kurs id und prameter k_id =>  http://localhost:5500/getTN   http://localhost:5500/getTN?k_id=2
+const get_tn_f_k = require("./teilnehmerCRUD_model");
+server.use("/getTN", get_tn_f_k);
