@@ -1,9 +1,7 @@
-const express = require("express");
-const mitarbeiterCRUD_model = express();
 const pool = require("./VSS_DatabaseConnect");
 
 // das ist die get damit  holt mann sein daten von database
-mitarbeiterCRUD_model.get("", async (req, res) => {
+const getAll_mitarbeiter = async (req, res) => {
   try {
     const abfrage = `
 SELECT m.*, kd.* FROM mitarbeiter m LEFT JOIN kontakt_daten kd ON m.mitarbeiter_id = fk_mitarbeiter_id;`;
@@ -15,10 +13,10 @@ SELECT m.*, kd.* FROM mitarbeiter m LEFT JOIN kontakt_daten kd ON m.mitarbeiter_
     console.error("Fehler beim Abrufen der Mitarbeite:", error);
     res.status(500).send("Server fehler :(");
   }
-});
+};
 
 // nur insert mitarbeiter
-mitarbeiterCRUD_model.post("", async (req, res) => {
+const insert_mitarbeiter = async (req, res) => {
   const {
     vorname,
     nachname,
@@ -48,10 +46,10 @@ mitarbeiterCRUD_model.post("", async (req, res) => {
     console.error("Fehler beim Hinzufügen des Mitarbeiters:", error);
     res.status(500).send("Interner Serverfehler");
   }
-});
+};
 
 // das ist für update bitttttttttte
-mitarbeiterCRUD_model.put("/:mitarbeiterId", async (req, res) => {
+const update_mitarbeiter =  async (req, res) => {
   const { mitarbeiterId } = req.params;
   const {
     vorname,
@@ -81,10 +79,10 @@ mitarbeiterCRUD_model.put("/:mitarbeiterId", async (req, res) => {
     console.error("Fehler beim aktualisieren des mitarbeiters:", error);
     res.status(500).send("hallo Server fehler :(");
   }
-});
+};
 
 // Löschen duch die id muss aber weiter bearbeitet
-mitarbeiterCRUD_model.delete("/:id_delete", async (req, res) => {
+const delete_mitarbeiter = async (req, res) => {
   const { id_delete } = req.params;
 
   try {
@@ -101,14 +99,16 @@ mitarbeiterCRUD_model.delete("/:id_delete", async (req, res) => {
     console.error("Fehler beim Löschen des Mitarbeiters:", error);
     res.status(500).send("Server fehler");
   }
-});
+};
 
-mitarbeiterCRUD_model.get("/:id", async (req, res) => {
+
+// hol die einzel mitarbeiter daten
+const mitarbeiter_Einzel_info = async (req, res) => {
   const { id } = req.params;
   try {
-    var selectAbfrage = "SELECT * FROM mitarbeiter WHERE mitarbeiter_id = $1";
-    var ergVonMitarbeiter = await pool.query(selectAbfrage, [id]);
-    var selectAbfrageKD =
+    selectAbfrage = "SELECT * FROM mitarbeiter WHERE mitarbeiter_id = $1";
+    ergVonMitarbeiter = await pool.query(selectAbfrage, [id]);
+    selectAbfrageKD =
       "SELECT * FROM kontakt_daten WHERE fk_mitarbeiter_id = $1";
     ergVonKontaktdatne = await pool.query(selectAbfrageKD, [id]);
     res.json({
@@ -119,6 +119,12 @@ mitarbeiterCRUD_model.get("/:id", async (req, res) => {
     console.error("Fehler beim selektieren der Mitarbeiterinfo:", error);
     res.status(500).send("hau ab ist doch Server fehler");
   }
-});
+};
 
-module.exports = mitarbeiterCRUD_model;
+module.exports = {
+  mitarbeiter_Einzel_info,
+  delete_mitarbeiter,
+  update_mitarbeiter,
+  insert_mitarbeiter,
+  getAll_mitarbeiter,
+};

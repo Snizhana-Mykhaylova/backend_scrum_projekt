@@ -2,7 +2,7 @@ const express = require("express");
 const pool = require("./VSS_DatabaseConnect");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const login_controller = express();
+
 
 const getUser =
   "SELECT * FROM user_login WHERE user_name =$1 AND user_password = $2";
@@ -11,7 +11,7 @@ const addUser =
 const getPassword =
   "SELECT user_password FROM user_login WHERE user_name=$1 LIMIT 1";
 
-login_controller.post("/login", async (req, res) => {
+const getUserLogin = async (req, res) => {
   try {
     const { user_name, user_password } = req.body;
 
@@ -35,9 +35,9 @@ login_controller.post("/login", async (req, res) => {
   } catch (error) {
     console.error("error", error);
   }
-});
+};
 
-login_controller.post("/singup", async (req, res) => {
+const checkUndAddUsersingup = async (req, res) => {
   try {
     const { user_name, user_password } = req.body;
 
@@ -62,6 +62,9 @@ login_controller.post("/singup", async (req, res) => {
   } catch (error) {
     console.error("error", error);
   }
-});
+};
 
-module.exports = login_controller;
+module.exports = {
+  getUserLogin,
+  checkUndAddUsersingup,
+};
