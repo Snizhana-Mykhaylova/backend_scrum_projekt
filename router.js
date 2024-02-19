@@ -87,10 +87,10 @@ server.put("/update_dozent/:id", dozentenCRUD.update_dozent);
 server.delete("/delete_dozent/:id", dozentenCRUD.delete_dozent);
 
 // // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen   => http://localhost:5500/dozent_buchung/6/7    die 6 ist dozent id und 7 die kurs id
-server.delete("/dozent_buchung/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);
+server.post("/dozent_buchung/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);
 
 // // // mit mit kann mann dozent und sein kontakt daten aufrufun durch id   => http://localhost:5500/get_one_dozent/8
-server.use("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
+server.get("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
 
 //***********************************************************************KURS********************************************************************* */
 

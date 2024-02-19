@@ -1,6 +1,5 @@
 const pool = require("./VSS_DatabaseConnect");
 
-
 // das ist die get damit  holt mann sein daten von database
 
 const insert_dozent = async (req, res) => {
@@ -35,8 +34,8 @@ const insert_dozent = async (req, res) => {
   }
 };
 
-// get dozent info durch get                
-const getAll_dozent_info =async (req, res) => {
+// get dozent info durch get
+const getAll_dozent_info = async (req, res) => {
   try {
     const abfrage = `
     SELECT d.*, kd.*
@@ -53,23 +52,24 @@ const getAll_dozent_info =async (req, res) => {
 
 // hier mit kann man löschen dozen und sein kontakt ddaten updaten  =>  http://localhost:5500/delete_dozent/5
 
-const delete_dozent =  async (req, res) => {
+const delete_dozent = async (req, res) => {
   const { id } = req.params;
   try {
-    kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
-    await pool.query(kontaktDeleteAbfrage, [id]);
-
-    dozentDeleteAbfrage = "DELETE FROM dozenten WHERE dozent_id =$1";
-    await pool.query(dozentDeleteAbfrage, [id]);
-
+   
+      kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
+      await pool.query(kontaktDeleteAbfrage, [id]);
+  
+      dozentDeleteAbfrage = "DELETE FROM dozenten WHERE dozent_id =$1";
+      await pool.query(dozentDeleteAbfrage, [id]);
+  
     res.status(200).send("wurde gelöscht");
   } catch (error) {
-    console.error("fehler beim dozent löschen");
+    console.error("fehler beim dozent löschen".error);
     res.status(500).send("server fehler");
   }
 };
 
-const update_dozent = async (req, res ) => {
+const update_dozent = async (req, res) => {
   const { id } = req.params;
   const {
     vorname,
@@ -86,23 +86,18 @@ const update_dozent = async (req, res ) => {
     dozentAbfrage =
       "UPDATE dozenten SET dozent_vorname = $1, dozent_nachname = $2 , dozent_fachgebiet = $3 WHERE dozent_id = $4";
     dozentWerte = [vorname, nachname, fachgebiet, id];
-    erg=  await pool.query(dozentAbfrage, dozentWerte);
-    
- 
-    
+    erg = await pool.query(dozentAbfrage, dozentWerte);
+
     kontaktAbfrage =
       "UPDATE kontakt_daten SET kd_ort = $1, kd_straße = $2, kd_haus_nr = $3, kd_plz = $4, kd_email = $5, kd_phone_nr = $6 WHERE fk_dozent_id = $7";
     werte = [ort, strasse, hause_nr, plz, email, phone, id];
-    erg2 =await pool.query(kontaktAbfrage, werte);
-  
-      res.status(200).send("dozent konatkt daten aktualisiert");
-    
-  
-   } catch (error) {
-      console.error("Fehler beim Aktualisieren des Dozenten:");
-      res.status(500).send("Fehler beim Aktualisieren des Dozenten.");
-    }
-    
+    erg2 = await pool.query(kontaktAbfrage, werte);
+
+    res.status(200).send("dozent konatkt daten aktualisiert");
+  } catch (error) {
+    console.error("Fehler beim Aktualisieren des Dozenten:");
+    res.status(500).send("Fehler beim Aktualisieren des Dozenten.");
+  }
 };
 
 // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen
@@ -138,8 +133,7 @@ const get_one_dozent = async (req, res) => {
   try {
     selectAbfrage = "SELECT * FROM dozenten WHERE dozent_id = $1";
     ergVonDozenten = await pool.query(selectAbfrage, [id]);
-    selectAbfrageKD =
-      "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
+    selectAbfrageKD = "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
     ergVonKontaktdatne = await pool.query(selectAbfrageKD, [id]);
     res.json({
       dozenten: ergVonDozenten.rows,
@@ -150,8 +144,6 @@ const get_one_dozent = async (req, res) => {
     res.status(500).send("hau ab ist doch Server fehler");
   }
 };
-
-
 
 module.exports = {
   insert_dozent,
