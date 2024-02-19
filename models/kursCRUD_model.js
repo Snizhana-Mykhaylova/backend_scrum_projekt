@@ -1,9 +1,8 @@
-const experss = require("express");
-const kursCRUD_model = experss();
 const pool = require("./VSS_DatabaseConnect");
 
+
 // insert ein kurs
-kursCRUD_model.post("", async (req, res) => {
+const insert_kurs =  async (req, res) => {
   const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
     req.body;
   try {
@@ -22,10 +21,10 @@ kursCRUD_model.post("", async (req, res) => {
     console.error("fehler beim kurs anlegen");
     res.status(500).send("server fehler");
   }
-});
+};
 
-// das ist nur dafür update
-kursCRUD_model.put("/:id", async (req, res) => {
+// // das ist nur dafür update
+const update_kurs = async (req, res) => {
   const { id } = req.params;
   const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
     req.body;
@@ -47,10 +46,10 @@ kursCRUD_model.put("/:id", async (req, res) => {
     console.error("fehler beim kurs updaten");
     res.status(500).send("server fehler");
   }
-});
+};
 
-// kurs löschen
-kursCRUD_model.delete("/:id", async (req, res) => {
+// // kurs löschen
+const delete_kurs = async (req, res) => {
   const { id } = req.params;
   try {
     kursDeleteAbfrage = "DELETE FROM kurse WHERE kurs_id = $1";
@@ -60,11 +59,12 @@ kursCRUD_model.delete("/:id", async (req, res) => {
     console.error("fehler beim kurs löschen");
     res.status(500).send("server fehler");
   }
-});
+};
 
 // hol die daten von kurses
-kursCRUD_model.get("", async (req, res) => {
+const getAll_kurs = async (req, res) => {
   try {
+
     const abfrage = `
     SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id;`;
     var erg2 = await pool.query(abfrage);
@@ -77,9 +77,29 @@ kursCRUD_model.get("", async (req, res) => {
     console.error("fehler beim select");
     res.status(500).send("server fehler");
   }
-});
+};
 
-module.exports = kursCRUD_model;
+// insert kurs zum buchung
+const inserK_buchung = async (req, res) => {
+  const { id } = req.params;
+  try {
+   sql = "INSERT INTO buchungen (kurs_fkey) VALUES ($1)";
+    await pool.query(sql, [id]);
+    res.status(200).send("kurs wurde gebucht");
+  } catch (error) {
+    console.error("fehler beim buchung");
+    res.status(500).send("server fehler");
+  }
+};
+
+module.exports = {
+  update_kurs,
+  getAll_kurs,
+  insert_kurs,
+  inserK_buchung,
+  delete_kurs,
+};
+
 
 // const express = require('express');
 // const axios = require('axios');
