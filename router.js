@@ -86,23 +86,23 @@ server.put("/update_dozent/:id", dozentenCRUD.update_dozent);
 // // dozent und sein kontakt daten zu löschen                    =>      http://localhost:5500/delete_dozent/8
 server.delete("/delete_dozent/:id", dozentenCRUD.delete_dozent);
 
-// // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen   => http://localhost:5500/dozent_buchung/6/7    die 6 ist dozent id und 7 die kurs id
-server.delete("/dozent_buchung/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);
+// // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen   =>                                                                                                                                                                                     die 6 ist dozent id und 7 die kurs id
+server.post("/dozent_intoKurs/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);                                                                                                                  
 
 // // // mit mit kann mann dozent und sein kontakt daten aufrufun durch id   => http://localhost:5500/get_one_dozent/8
-server.use("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
+server.get("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
 
 //***********************************************************************KURS********************************************************************* */
 
-// damit kann mann alle kurse info aufrufen                                    =>    http://localhost:5500/getAll_kurs
-server.get("/getAll_kurs_info", kursCRUD.getAll_kurs);
+// damit kann mann alle kurse info aufrufen                      =>    http://localhost:5500/getAll_kurs
+server.get("/getAll_kurs_info", kursCRUD.getAll_kurs);                                                                                                                                       
 
 // update kurs                                             =>      http://localhost:5500/update_kurs
 server.put("/update_kurs/:id", kursCRUD.update_kurs);
 
 
-// damit kann mann beteímmte kurse info mit id                                    =>    http://localhost:5500/getKursbyId
-server.get("/getKursbyId/:id", kursCRUD.getAll_kurs);
+// damit kann mann beteímmte kurse info mit id                       =>    http://localhost:5500/get_one_kurs
+server.get("/get_one_kurs/:id", kursCRUD.get_one_kurs);
 
 
 // löschen des kurses                                       =>     http://localhost:5500/delete_kurs
