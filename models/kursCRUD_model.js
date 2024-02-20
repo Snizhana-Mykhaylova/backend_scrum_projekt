@@ -1,8 +1,7 @@
 const pool = require("./VSS_DatabaseConnect");
 
-
 // insert ein kurs
-const insert_kurs =  async (req, res) => {
+const insert_kurs = async (req, res) => {
   const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
     req.body;
   try {
@@ -64,7 +63,6 @@ const delete_kurs = async (req, res) => {
 // hol die daten von kurses
 const getAll_kurs = async (req, res) => {
   try {
-
     const abfrage = `
     SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id;`;
     var erg2 = await pool.query(abfrage);
@@ -79,11 +77,41 @@ const getAll_kurs = async (req, res) => {
   }
 };
 
+const delte = async (req ,res) => {
+  try {
+    const {id} = req.params;
+    sql = "DELETE FROM kurse WHERE kurs_id = $1";
+    erg = await pool.query(sql , [id])
+    if (erg != 0){
+      console.log("kurs wurde gelöscht")
+      res.status(200).send("OK")
+    }
+  } catch (error) {
+    console.error("fehler beim kurs löschne".error);
+    res.status(500).send("server fehler")
+  }
+}
+const get_one_kurs = async (req, res) => {
+  const { id } = req.params;
+  try {
+ 
+    const abfrage = "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
+    erg = await pool.query(abfrage, [id]);
+
+    res.json(
+      {kurse:erg.rows});
+    return erg;
+  } catch (error) {
+    console.error("fehler beim select");
+    res.status(500).send("server fehler");
+    return null;
+  }
+};
 // insert kurs zum buchung
 const inserK_buchung = async (req, res) => {
   const { id } = req.params;
   try {
-   sql = "INSERT INTO buchungen (kurs_fkey) VALUES ($1)";
+    sql = "INSERT INTO buchungen (kurs_fkey) VALUES ($1)";
     await pool.query(sql, [id]);
     res.status(200).send("kurs wurde gebucht");
   } catch (error) {
@@ -98,8 +126,8 @@ module.exports = {
   insert_kurs,
   inserK_buchung,
   delete_kurs,
+  get_one_kurs,
 };
-
 
 // const express = require('express');
 // const axios = require('axios');
