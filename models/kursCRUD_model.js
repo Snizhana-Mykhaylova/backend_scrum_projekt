@@ -108,17 +108,29 @@ const get_one_kurs = async (req, res) => {
   }
 };
 // insert kurs zum buchung
-const inserK_buchung = async (req, res) => {
-  const { id } = req.params;
+const inserK_buchung = async  (req, res) => {
+  const { id_k , id } = req.params;
   try {
-    sql = "INSERT INTO buchungen (kurs_fkey) VALUES ($1)";
-    await pool.query(sql, [id]);
+    sqlAbfarge = "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey =  $1";
+    werte1 = [id , id_k]
+    erg = await pool.query(sqlAbfarge , werte1)
+    if(erg != 0){
+      res.status(400).send("teilnehmer ist schon in diesem kurs")
+    }else{
+       sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
+       werte = [id , id_k]
+       await pool.query(sql ,werte);
     res.status(200).send("kurs wurde gebucht");
+  }
   } catch (error) {
     console.error("fehler beim buchung");
     res.status(500).send("server fehler");
   }
 };
+
+
+
+ const check = 
 
 module.exports = {
   update_kurs,
