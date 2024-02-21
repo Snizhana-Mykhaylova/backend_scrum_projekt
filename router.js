@@ -112,7 +112,7 @@ server.delete("/delete_kurs/:id", kursCRUD.delete_kurs);
 server.post("/insert_kurs", kursCRUD.insert_kurs);
 
 // // insert kurs zum buchung                                  =>       http://localhost:5500/inserK_buchung
-server.post("/inserK_buchung", kursCRUD.inserK_buchung);
+server.post("/inserK_buchung/:id/:id_k", kursCRUD.inserK_buchung);
 
 //******************************************************************************************************************************************** */
 

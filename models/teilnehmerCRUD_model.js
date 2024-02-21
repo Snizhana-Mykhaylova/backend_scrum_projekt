@@ -95,7 +95,7 @@ const teilnehemr_delete = async (req, res) => {
   } catch (error) {
     await pool.query('ROLLBACK');
     console.error("Fehler beim Löschen des Teilnehmers:", error);
-    res.status(500).send("Fehler beim Löschen des Teilnehmers");
+    res.status(500).send("Fehler beim Löschen des Teilnehmers"); 
   }
 };
 
