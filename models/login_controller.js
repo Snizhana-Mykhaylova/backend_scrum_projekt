@@ -14,23 +14,32 @@ const getPassword =
 const getUserLogin = async (req, res) => {
   try {
     const { user_name, user_password } = req.body;
+    console.log(user_name);
+    console.log(user_password);
 
-    pool.query(getPassword, [user_name], async (error, results) => {
-      if (results.rows.length) {
-        const DBuserpassword = results.rows[0].user_password;
-        const isValid = await bcrypt.compare(user_password, DBuserpassword);
-        if (isValid) {
-          console.log("Sucssess!");
-          res.status(201).send("home"); // weg zum home seite
-          return;
-        } else {
-          console.log("Faild!");
-          res.status(404).send("login"); // weg zum login seite
+    pool.query(queries.getUser, async (error, results) => {
+      results.rows.forEach((element) => {
+        const row = Object.values(element);
+        const username = row[0];
+        const password = row[1];
+        const isValid = bcrypt.compareSync(user_password, password);
+
+        if (username && isValid) {
+          console.log("Username und Password sind richtig");
+          return res.json({ Message: "Username und Password sind richtig" });
+          //   return res.sendFile(path.join(__dirname, '../views/MainComponent.js'));
         }
-      } else {
-        console.log("Faild!");
-        res.status(404).send("login"); // weg zum login seiter
-      }
+
+        if (!username && isValid) {
+          console.log("Username ist nicht korrekt");
+          return res.json({ Message: "Username ist nicht korrekt" });
+        }
+
+        if (username && !isValid) {
+          console.log("Passwort ist nicht korrekt");
+          return res.json({ Message: "Passwort ist nicht korrekt" });
+        }
+      });
     });
   } catch (error) {
     console.error("error", error);
@@ -41,22 +50,20 @@ const checkUndAddUsersingup = async (req, res) => {
   try {
     const { user_name, user_password } = req.body;
 
-    const hashpassword = await bcrypt.hash(user_password, saltRounds);
-
-    pool.query(addUser, [user_name, hashpassword], (error, result) => {
-      if (error) throw error;
-      res.status(200).send("ok");
-    });
-
-    pool.query(getUser, [user_name, user_password], (error, results) => {
+    pool.query(queries.getUser, (error, results) => {
       if (results.rows.length) {
-        res.send("Username and Password already exists!").status(401);
-        return next();
-      }
+        return res.send("Username is already exist");
+      } else {
+        const hashpassword = bcrypt.hash(user_password, saltRounds);
 
-      const DBusername = results.rows.user_name;
-      if (DBusername === user_name) {
-        res.send("Username is already exist").send(401);
+        pool.query(
+          queries.addUser,
+          [user_name, hashpassword],
+          (error, result) => {
+            if (error) throw error;
+            res.status(200).send("ok");
+          }
+        );
       }
     });
   } catch (error) {
