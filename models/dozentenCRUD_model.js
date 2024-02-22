@@ -14,14 +14,12 @@ const insert_dozent = async (req, res) => {
     email,
     hause_nr,
   } = req.body;
-
   try {
     const dozentAbfrage =
       "INSERT INTO dozenten (dozent_vorname , dozent_nachname , dozent_fachgebiet) VALUES ($1, $2,$3) RETURNING dozent_id";
     const dozentWerte = [vorname, nachname, fachgebiet];
     const erg = await pool.query(dozentAbfrage, dozentWerte);
     const id = erg.rows[0].dozent_id;
-
     const kontaktAbfrage =
       "INSERT INTO kontakt_daten (fk_dozent_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6,$7)";
     const werte = [id, ort, strasse, hause_nr, plz, email, phone];
@@ -55,13 +53,13 @@ const getAll_dozent_info = async (req, res) => {
 const delete_dozent = async (req, res) => {
   const { id } = req.params;
   try {
-   
+
       kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
       await pool.query(kontaktDeleteAbfrage, [id]);
-  
+
       dozentDeleteAbfrage = "DELETE FROM dozenten WHERE dozent_id =$1";
       await pool.query(dozentDeleteAbfrage, [id]);
-  
+
     res.status(200).send("wurde gelöscht");
   } catch (error) {
     console.error("fehler beim dozent löschen".error);

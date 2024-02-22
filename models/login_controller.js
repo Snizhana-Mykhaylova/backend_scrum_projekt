@@ -34,7 +34,6 @@ const getUserLogin = async (req, res) => {
           console.log("Username ist nicht korrekt");
           return res.json({ Message: "Username ist nicht korrekt" });
         }
-
         if (username && !isValid) {
           console.log("Passwort ist nicht korrekt");
           return res.json({ Message: "Passwort ist nicht korrekt" });

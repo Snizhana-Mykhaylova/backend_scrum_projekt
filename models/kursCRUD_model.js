@@ -94,12 +94,11 @@ const getAll_kurs = async (req, res) => {
 const get_one_kurs = async (req, res) => {
   const { id } = req.params;
   try {
- 
-    const abfrage = "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
+    const abfrage =
+      "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
     erg = await pool.query(abfrage, [id]);
 
-    res.json(
-      {kurse:erg.rows});
+    res.json({ kurse: erg.rows });
     return erg;
   } catch (error) {
     console.error("fehler beim select");
@@ -108,100 +107,32 @@ const get_one_kurs = async (req, res) => {
   }
 };
 // insert kurs zum buchung
-const inserK_buchung = async  (req, res) => {
-  const { id_k , id } = req.params;
+const inserK_buchung = async (req, res) => {
+  const { id_k, id } = req.params;
   try {
-    sqlAbfarge = "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey =  $1";
-    werte1 = [id , id_k]
-    erg = await pool.query(sqlAbfarge , werte1)
-    if(erg != 0){
-      res.status(400).send("teilnehmer ist schon in diesem kurs")
-    }else{
-       sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
-       werte = [id , id_k]
-       await pool.query(sql ,werte);
-    res.status(200).send("kurs wurde gebucht");
-  }
+    sqlAbfarge =
+      "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey =  $1";
+    werte1 = [id, id_k];
+    erg = await pool.query(sqlAbfarge, werte1);
+    if (erg != 0) {
+      res.status(400).send("teilnehmer ist schon in diesem kurs");
+    } else {
+      sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
+      werte = [id, id_k];
+      await pool.query(sql, werte);
+      res.status(200).send("kurs wurde gebucht");
+    }
   } catch (error) {
     console.error("fehler beim buchung");
     res.status(500).send("server fehler");
   }
 };
 
-
-
- const check = 
-
-module.exports = {
+const check = (module.exports = {
   update_kurs,
   getAll_kurs,
   insert_kurs,
   inserK_buchung,
   delete_kurs,
   get_one_kurs,
-};
-
-// const express = require('express');
-// const axios = require('axios');
-// const cors = require('cors');
-
-// const app = express();
-// const PORT = 3000;
-
-// app.use(cors());
-
-// app.get('/teilnehmer', async (req, res) => {
-//   try {
-//     const response = await axios.get('URL_DEINES_BACKEND_ENDPOINTS');
-//     const teilnehmerList = response.data;
-//     res.json(teilnehmerList);
-//   } catch (error) {
-//     console.error('Fehler beim Abrufen der Teilnehmer:', error);
-//     res.status(500).send('Serverfehler :(');
-//   }
-// });
-
-// app.listen(PORT, () => {
-//   console.log(`Server läuft auf http://localhost:${PORT}`);
-// });
-
-// import React, { useState, useEffect } from 'react';
-// import axios from 'axios'; // Stelle sicher, dass du axios installiert hast: npm install axios
-
-// function TeilnehmerDropdown() {
-//   const [teilnehmerList, setTeilnehmerList] = useState([]);
-
-//   useEffect(() => {
-//     async function fetchTeilnehmer() {
-//       try {
-//         const response = await axios.get('URL_DEINES_BACKEND_ENDPOINTS');
-//         setTeilnehmerList(response.data);
-//       } catch (error) {
-//         console.error('Fehler beim Abrufen der Teilnehmer:', error);
-//       }
-//     }
-
-//     fetchTeilnehmer();
-//   }, []); // Leeres Array als Abhängigkeit, um sicherzustellen, dass dieser Effekt nur einmal ausgeführt wird
-
-//   return (
-//     <DropdownOptions teilnehmerList={teilnehmerList} />
-//   );
-// }
-
-// function DropdownOptions({ teilnehmerList }) {
-//   return (
-//     <div>
-//       <label htmlFor="teilnehmerDropdown">Teilnehmer:</label>
-//       <select id="teilnehmerDropdown">
-//         {teilnehmerList.map((teilnehmer) => (
-//           <option key={teilnehmer.teilnehmer_id} value={teilnehmer.teilnehmer_id}>
-//             {teilnehmer.name} {/* Annahme: 'name' ist ein Feld im Teilnehmerdatensatz */}
-//           </option>
-//         ))}
-//       </select>
-//     </div>
-//   );
-// }
-
-// export default TeilnehmerDropdown;
+});

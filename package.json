@@ -11,6 +11,7 @@
     "nodemon": "^3.0.3",
     "package-lock.json": "^1.0.0",
     "package.json": "^2.0.1",
+    "pg": "^8.11.3",
     "Router": "^2.1.0",
     "routes": "^2.1.0"
   }

@@ -17,7 +17,6 @@ const dozentenCRUD = require("./models/dozentenCRUD_model.js");
 const kursCRUD = require("./models/kursCRUD_model.js");
 const loginCRUD = require("./models/login_controller.js");
 
-
 //***********************************************************************TEILNEHMER********************************************************************* */
 
 // das ist die get damit  holt mann sein daten von database mitGET  =>  http://localhost:5500/get_teilnehmer_info
@@ -37,7 +36,7 @@ server.get("/teilnehemr_einzel/info/:E_id", teilnehemrCRUD.get_tnEinzel);
 
 // hier mit kann man ein teilnehemr in ein gebuchte kurs hinfügen mit PUT bitte    =>     http://localhost:5500/insert_tn_buchung/7/48
 
-server.post( "/insert_tn_buchung",teilnehemrCRUD.tn_buchung_insert);
+server.post("/insert_tn_buchung", teilnehemrCRUD.tn_buchung_insert);
 
 //hier mit kann mann die teilnehmer die ein bestimmte kurs besuchen rausfinden durch kurs id und prameter k_id =>  http://localhost:5500/getTN_Fbuchung   http://localhost:5500/getTN_Fbuchung?k_id=2
 
@@ -53,7 +52,10 @@ server.get("/get_mitarbeiter_info", mitarbeiterCRUD.getAll_mitarbeiter);
 server.post("/insert_mitarbeiter", mitarbeiterCRUD.insert_mitarbeiter);
 
 // das ist für update bitttttttttte ders mitabeiters mitPUT durch id   => http://localhost:5500/update_mitarbeiter/12
-server.put("/update_mitarbeiter/:mitarbeiterId",mitarbeiterCRUD.update_mitarbeiter);
+server.put(
+  "/update_mitarbeiter/:mitarbeiterId",
+  mitarbeiterCRUD.update_mitarbeiter
+);
 
 // Löschen duch die id muss aber weiter bearbeitet durch id           => http://localhost:5500/delete_mitarbeiter/9
 server.delete(
@@ -84,7 +86,7 @@ server.put("/update_dozent/:id", dozentenCRUD.update_dozent);
 server.delete("/delete_dozent/:id", dozentenCRUD.delete_dozent);
 
 // // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen   =>                                                                                                                                                                                     die 6 ist dozent id und 7 die kurs id
-server.post("/dozent_intoKurs/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);                                                                                                                  
+server.post("/dozent_intoKurs/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);
 
 // // // mit mit kann mann dozent und sein kontakt daten aufrufun durch id   => http://localhost:5500/get_one_dozent/8
 server.get("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
@@ -92,15 +94,13 @@ server.get("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
 //***********************************************************************KURS********************************************************************* */
 
 // damit kann mann alle kurse info aufrufen                      =>    http://localhost:5500/getAll_kurs
-server.get("/getAll_kurs_info", kursCRUD.getAll_kurs);                                                                                                                                       
+server.get("/getAll_kurs_info", kursCRUD.getAll_kurs);
 
 // update kurs                                             =>      http://localhost:5500/update_kurs
 server.put("/update_kurs/:id", kursCRUD.update_kurs);
 
-
 // damit kann mann beteímmte kurse info mit id                       =>    http://localhost:5500/get_one_kurs
 server.get("/get_one_kurs/:id", kursCRUD.get_one_kurs);
-
 
 // löschen des kurses                                       =>     http://localhost:5500/delete_kurs
 server.delete("/delete_kurs/:id", kursCRUD.delete_kurs);
@@ -130,5 +130,3 @@ server.listen(port, () => {
 //******************************************************************************************************************************************** */
 // test aera
 module.exports = server;
-
-//******************************************************************************************************************************************** */
