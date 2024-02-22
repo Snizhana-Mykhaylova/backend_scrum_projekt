@@ -100,18 +100,35 @@ const teilnehemr_delete = async (req, res) => {
 };
 
 // Teilnehmer zu einem gebuchten Kurs hinzufügen
-const tn_buuchung_insert =async (req, res) => {
-  const { tn_id, besuch_id } = req.params;
+const tn_buchung_insert = async (req, res) => {
+  const { teilnehmer_ids, k_id } = req.body; 
+  const client = await pool.connect();
+
   try {
-    const sql = "UPDATE buchungen SET teilnehmer_fkey = $1 WHERE buchung_id = $2";
-    const werte = [tn_id, besuch_id];
-    const erg = await pool.query(sql, werte);
-    res.status(200).send("Teilnehmer zum gebuchten Kurs hinzugefügt");
+    if (!Array.isArray(teilnehmer_ids) || teilnehmer_ids.length === 0) {
+      return res.status(400).send("teilnehmer id  ungültig");
+    }
+
+    await abfrage.query("BEGIN"); 
+
+    for (const tn_id of teilnehmer_ids) {
+      const sql = "INSERT INTO buchungen (teilnehmer_fkey, kurs_fkey) VALUES ($1, $2)";
+      const werte = [tn_id, k_id];
+      await abfrage.query(sql, werte);
+    }
+
+    await abfrage.query("COMMIT"); 
+    res.status(200).send("teilnehmer zum gebuchten Kurs hinzugefügt");
   } catch (error) {
-    console.error("Fehler beim Einfügen:", error);
-    res.status(500).send("Serverfehler");
+    await abfrage.query("ROLLBACK");
+    console.error("fehler beim finfügen:", error);
+    res.status(500).send("Server fehler");
+  } finally {
+    client.release();
   }
 };
+
+  
 
 // Teilnehmer, die einen bestimmten Kurs besuchen, abrufen
 const get_enzelTN_buchung = async (req, res) => {
@@ -133,7 +150,7 @@ const get_enzelTN_buchung = async (req, res) => {
 
 module.exports = {
   get_enzelTN_buchung,
-  tn_buuchung_insert,
+  tn_buchung_insert,
   get_tnEinzel,
   getAll_teilnehmer,
   insert_teilnehmer,
