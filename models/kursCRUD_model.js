@@ -14,9 +14,11 @@ const pool = require("./VSS_DatabaseConnect");
  * @param {Object} res - Express Response-Objekt
  */
 const insert_kurs = async (req, res) => {
+  // Extrahieren der Kursinformationen aus dem Anfrageobjekt
   const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
     req.body;
   try {
+    // Abfrage zum Einfügen des Kurses in die Datenbank
     const kursAbfrage =
       "INSERT INTO kurse (kurs_name , kurs_beschreibung, kurs_start_datum ,kurs_end_datum) VALUES ($1,$2,$3,$4)";
     const kursWerte = [
@@ -45,6 +47,7 @@ const update_kurs = async (req, res) => {
   const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
     req.body;
   try {
+    // Abfrage zum Aktualisieren der Kursinformationen in der Datenbank
     const kursUpdateAbfrage =
       "UPDATE kurse SET kurs_name = $1 , kurs_beschreibung =$2 , kurs_start_datum =$3 ,kurs_end_datum = $4 WHERE kurs_id = $5";
     const kursUpdateWerte = [
@@ -72,6 +75,7 @@ const update_kurs = async (req, res) => {
 const delete_kurs = async (req, res) => {
   const { id } = req.params;
   try {
+    // Abfrage zum Löschen des Kurses aus der Datenbank
     const kursDeleteAbfrage = "DELETE FROM kurse WHERE kurs_id = $1";
     await pool.query(kursDeleteAbfrage, [id]);
     res.status(200).send("Kurs erfolgreich gelöscht!");
@@ -89,6 +93,7 @@ const delete_kurs = async (req, res) => {
  */
 const getAll_kurs = async (req, res) => {
   try {
+    // Abfrage zum Abrufen aller Kurse aus der Datenbank
     const abfrage = `
     SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id;`;
     const erg = await pool.query(abfrage);
@@ -111,6 +116,7 @@ const getAll_kurs = async (req, res) => {
 const get_one_kurs = async (req, res) => {
   const { id } = req.params;
   try {
+    // Abfrage zum Abrufen der Informationen eines bestimmten Kurses aus der Datenbank
     const abfrage =
       "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
     erg = await pool.query(abfrage, [id]);
@@ -123,17 +129,25 @@ const get_one_kurs = async (req, res) => {
   }
 };
 
-// insert kurs zum buchung
+/**
+ * Funktion zum Buchen eines Kurses für einen Teilnehmer.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const inserK_buchung = async (req, res) => {
+  // Extrahieren der Kurs- und Teilnehmer-IDs aus den Anfrageparametern
   const { id_k, id } = req.params;
   try {
+    // Abfrage zum Überprüfen, ob der Teilnehmer bereits für den Kurs gebucht ist
     sqlAbfarge =
       "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey =  $1";
     werte1 = [id, id_k];
     erg = await pool.query(sqlAbfarge, werte1);
+    // Wenn der Teilnehmer bereits für den Kurs gebucht hat, wird eine Fehlermeldung zurückgegeben
     if (erg != 0) {
       res.status(400).send("teilnehmer ist schon in diesem kurs");
     } else {
+      // Abfrage zum Buchen des Kurses für den Teilnehmer
       sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
       werte = [id, id_k];
       await pool.query(sql, werte);
@@ -145,6 +159,7 @@ const inserK_buchung = async (req, res) => {
   }
 };
 
+// Exportieren der Funktionen des Moduls
 const check = (module.exports = {
   update_kurs,
   getAll_kurs,

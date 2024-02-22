@@ -177,17 +177,17 @@ const tn_buchung_insert = async (req, res) => {
       return res.status(400).send("Teilnehmer-ID(s) ungültig");
     }
 
-    await abfrage.query("BEGIN");
+    await pool.query("BEGIN");
 
     // Durchläuft das Array der Teilnehmer-IDs und fügt jeden Teilnehmer zum Kurs hinzu
     for (const tn_id of teilnehmer_ids) {
       const sql =
         "INSERT INTO buchungen (teilnehmer_fkey, kurs_fkey) VALUES ($1, $2)";
       const werte = [tn_id, k_id];
-      await client.query(sql, werte);
+      await pool.query(sql, werte);
     }
 
-    await abfrage.query("COMMIT");
+    await pool.query("COMMIT");
     res.status(200).send("teilnehmer zum gebuchten Kurs hinzugefügt");
   } catch (error) {
     // Rollback der Transaktion bei einem Fehler und Senden einer Fehlermeldung an den Client
