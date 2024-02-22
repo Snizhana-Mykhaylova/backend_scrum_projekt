@@ -72,13 +72,11 @@ const getAll_dozent_info = async (req, res) => {
 const delete_dozent = async (req, res) => {
   const { id } = req.params;
   try {
+    kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
+    await pool.query(kontaktDeleteAbfrage, [id]);
 
-
-      kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
-      await pool.query(kontaktDeleteAbfrage, [id]);
-
-      dozentDeleteAbfrage = "DELETE FROM dozenten WHERE dozent_id =$1";
-      await pool.query(dozentDeleteAbfrage, [id]);
+    dozentDeleteAbfrage = "DELETE FROM dozenten WHERE dozent_id =$1";
+    await pool.query(dozentDeleteAbfrage, [id]);
 
     res.status(200).send("wurde gelöscht");
   } catch (error) {
@@ -153,7 +151,8 @@ const get_one_dozent = async (req, res) => {
   try {
     const selectAbfrage = "SELECT * FROM dozenten WHERE dozent_id = $1";
     const ergVonDozenten = await pool.query(selectAbfrage, [id]);
-    const selectAbfrageKD = "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
+    const selectAbfrageKD =
+      "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
     const ergVonKontaktdatne = await pool.query(selectAbfrageKD, [id]);
     res.json({
       dozenten: ergVonDozenten.rows,

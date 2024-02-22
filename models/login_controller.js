@@ -10,9 +10,12 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 // SQL-Abfragen definieren
-const getUser = "SELECT * FROM user_login WHERE user_name =$1 AND user_password = $2";
-const addUser = "INSERT INTO user_login (user_name, user_password) VALUES ($1,$2)";
-const getPassword = "SELECT user_password FROM user_login WHERE user_name=$1 LIMIT 1";
+const getUser =
+  "SELECT * FROM user_login WHERE user_name =$1 AND user_password = $2";
+const addUser =
+  "INSERT INTO user_login (user_name, user_password) VALUES ($1,$2)";
+const getPassword =
+  "SELECT user_password FROM user_login WHERE user_name=$1 LIMIT 1";
 
 /**
  * @function getUserLogin
@@ -67,14 +70,10 @@ const checkUndAddUsersingup = async (req, res) => {
       } else {
         const hashpassword = bcrypt.hashSync(user_password, saltRounds);
 
-        pool.query(
-          addUser,
-          [user_name, hashpassword],
-          (error, result) => {
-            if (error) throw error;
-            res.status(200).send("Erfolgreich registriert");
-          }
-        );
+        pool.query(addUser, [user_name, hashpassword], (error, result) => {
+          if (error) throw error;
+          res.status(200).send("Erfolgreich registriert");
+        });
       }
     });
   } catch (error) {
