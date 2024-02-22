@@ -77,20 +77,20 @@ const getAll_kurs = async (req, res) => {
   }
 };
 
-const delte = async (req ,res) => {
-  try {
-    const {id} = req.params;
-    sql = "DELETE FROM kurse WHERE kurs_id = $1";
-    erg = await pool.query(sql , [id])
-    if (erg != 0){
-      console.log("kurs wurde gelöscht")
-      res.status(200).send("OK")
-    }
-  } catch (error) {
-    console.error("fehler beim kurs löschne".error);
-    res.status(500).send("server fehler")
-  }
-}
+// const delte = async (req ,res) => {
+//   try {
+//     const {id} = req.params;
+//     sql = "DELETE FROM kurse WHERE kurs_id = $1";
+//     erg = await pool.query(sql , [id])
+//     if (erg != 0){
+//       console.log("kurs wurde gelöscht")
+//       res.status(200).send("OK")
+//     }
+//   } catch (error) {
+//     console.error("fehler beim kurs löschne".error);
+//     res.status(500).send("server fehler")
+//   }
+// }
 const get_one_kurs = async (req, res) => {
   const { id } = req.params;
   try {

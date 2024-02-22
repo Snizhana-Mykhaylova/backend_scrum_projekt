@@ -37,10 +37,7 @@ server.get("/teilnehemr_einzel/info/:E_id", teilnehemrCRUD.get_tnEinzel);
 
 // hier mit kann man ein teilnehemr in ein gebuchte kurs hinfügen mit PUT bitte    =>     http://localhost:5500/insert_tn_buchung/7/48
 
-server.put(
-  "/insert_tn_buchung/:tn_id/:besuch_id",
-  teilnehemrCRUD.tn_buuchung_insert
-);
+server.post( "/insert_tn_buchung",teilnehemrCRUD.tn_buchung_insert);
 
 //hier mit kann mann die teilnehmer die ein bestimmte kurs besuchen rausfinden durch kurs id und prameter k_id =>  http://localhost:5500/getTN_Fbuchung   http://localhost:5500/getTN_Fbuchung?k_id=2
 
