@@ -14,10 +14,17 @@ const pool = require("./VSS_DatabaseConnect");
  * @param {Object} res - Express Response-Objekt
  */
 const insert_kurs = async (req, res) => {
-  const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } = req.body;
+  const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
+    req.body;
   try {
-    const kursAbfrage = "INSERT INTO kurse (kurs_name , kurs_beschreibung, kurs_start_datum ,kurs_end_datum) VALUES ($1,$2,$3,$4)";
-    const kursWerte = [kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum];
+    const kursAbfrage =
+      "INSERT INTO kurse (kurs_name , kurs_beschreibung, kurs_start_datum ,kurs_end_datum) VALUES ($1,$2,$3,$4)";
+    const kursWerte = [
+      kurs_name,
+      kurs_beschreibung,
+      kurs_start_datum,
+      kurs_end_datum,
+    ];
     await pool.query(kursAbfrage, kursWerte);
 
     res.status(200).send("Kurs erfolgreich hinzugefügt!");
@@ -35,10 +42,18 @@ const insert_kurs = async (req, res) => {
  */
 const update_kurs = async (req, res) => {
   const { id } = req.params;
-  const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } = req.body;
+  const { kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum } =
+    req.body;
   try {
-    const kursUpdateAbfrage = "UPDATE kurse SET kurs_name = $1 , kurs_beschreibung =$2 , kurs_start_datum =$3 ,kurs_end_datum = $4 WHERE kurs_id = $5";
-    const kursUpdateWerte = [kurs_name, kurs_beschreibung, kurs_start_datum, kurs_end_datum, id];
+    const kursUpdateAbfrage =
+      "UPDATE kurse SET kurs_name = $1 , kurs_beschreibung =$2 , kurs_start_datum =$3 ,kurs_end_datum = $4 WHERE kurs_id = $5";
+    const kursUpdateWerte = [
+      kurs_name,
+      kurs_beschreibung,
+      kurs_start_datum,
+      kurs_end_datum,
+      id,
+    ];
     await pool.query(kursUpdateAbfrage, kursUpdateWerte);
 
     res.status(200).send("Kurs erfolgreich aktualisiert!");
@@ -96,7 +111,6 @@ const getAll_kurs = async (req, res) => {
 const get_one_kurs = async (req, res) => {
   const { id } = req.params;
   try {
-
     const abfrage =
       "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
     erg = await pool.query(abfrage, [id]);
@@ -131,7 +145,6 @@ const inserK_buchung = async (req, res) => {
   }
 };
 
-
 const check = (module.exports = {
   update_kurs,
   getAll_kurs,
@@ -139,5 +152,4 @@ const check = (module.exports = {
   inserK_buchung,
   delete_kurs,
   get_one_kurs,
-
 });

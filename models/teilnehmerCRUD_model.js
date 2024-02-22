@@ -13,7 +13,7 @@ const getAll_teilnehmer = async (req, res) => {
     // SQL-Abfrage, die Teilnehmerdaten und zugehörige Kontaktdaten aus der Datenbank abruft
     const Abfrage = `
       SELECT t.*, kd.* FROM teilnehmer t LEFT JOIN kontakt_daten kd ON t.teilnehmer_id = kd.fk_teilnehmer_id;`;
-    
+
     // Ausführung der SQL-Abfrage über die mit pool.query verbundene Datenbankverbindung
     const result = await pool.query(Abfrage);
 
@@ -26,11 +26,10 @@ const getAll_teilnehmer = async (req, res) => {
   }
 };
 
-
 // Teilnehmer Einzelinfo durch ID aufrufen
 const get_tnEinzel = async (req, res) => {
   const { E_id } = req.params;
-  
+
   try {
     // SQL-Abfrage, um Teilnehmerdaten basierend auf der Teilnehmer-ID abzurufen
     const selectAbfrage = "SELECT * FROM teilnehmer WHERE teilnehmer_id = $1";
@@ -38,7 +37,7 @@ const get_tnEinzel = async (req, res) => {
     const selectAbfrageKD =
       "SELECT * FROM kontakt_daten WHERE fk_teilnehmer_id = $1";
     const ergVonKontaktdaten = await pool.query(selectAbfrageKD, [E_id]);
-    
+
     // Sendet die abgerufenen Teilnehmer- und Kontaktdaten als JSON-Antwort
     res.json({
       teilnehmer: ergVonTeilnehmer.rows,
@@ -60,7 +59,6 @@ const get_tnEinzel = async (req, res) => {
  * @throws {error} - Wirft einen Fehler, wenn das Hinzufügen des Teilnehmers fehlschlägt.
  */
 const insert_teilnehmer = async (req, res) => {
-
   const { vorname, nachname, phone, plz, ort, strasse, email, hause_nr } =
     req.body;
   try {
@@ -71,7 +69,6 @@ const insert_teilnehmer = async (req, res) => {
     const teilnehmerWerte = [vorname, nachname];
     const teilnehmerErg = await pool.query(teilnehmerAbfrage, teilnehmerWerte);
     const teilnehmerId = teilnehmerErg.rows[0].teilnehmer_id;
-
 
     const TN_KD_Abfrage =
       "INSERT INTO kontakt_daten (fk_teilnehmer_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6, $7)";
@@ -156,7 +153,6 @@ const teilnehemr_delete = async (req, res) => {
     // Sendet eine Erfolgsmeldung mit dem HTTP-Statuscode 200 (OK)
     res.status(200).send("Teilnehmer gelöscht!");
   } catch (error) {
-
     await pool.query("ROLLBACK");
     console.error("Fehler beim Löschen des Teilnehmers:", error);
     res.status(500).send("Fehler beim Löschen des Teilnehmers");
@@ -172,7 +168,6 @@ const teilnehemr_delete = async (req, res) => {
  * @throws {error} - Wirft einen Fehler, wenn das Hinzufügen der Teilnehmer zum Kurs fehlschlägt.
  */
 const tn_buchung_insert = async (req, res) => {
-
   const { teilnehmer_ids, k_id } = req.body;
   const client = await pool.connect();
 
@@ -181,7 +176,6 @@ const tn_buchung_insert = async (req, res) => {
     if (!Array.isArray(teilnehmer_ids) || teilnehmer_ids.length === 0) {
       return res.status(400).send("Teilnehmer-ID(s) ungültig");
     }
-
 
     await abfrage.query("BEGIN");
 
@@ -206,7 +200,6 @@ const tn_buchung_insert = async (req, res) => {
   }
 };
 
-
 // Teilnehmer, die einen bestimmten Kurs besuchen, abrufen
 const get_enzelTN_buchung = async (req, res) => {
   // Extrahiert die Kurs-ID aus den Parametern der Anfrage
@@ -220,7 +213,7 @@ const get_enzelTN_buchung = async (req, res) => {
       JOIN buchungen b ON t.teilnehmer_id = b.teilnehmer_fkey 
       JOIN kurse k ON b.kurs_fkey = k.kurs_id 
       WHERE k.kurs_id = $1`;
-    
+
     // Führt die SQL-Abfrage aus und gibt die Ergebnisse als JSON zurück
     const erg = await pool.query(teilnehmerAbfrage, [k_id]);
     res.status(200).json(erg.rows);
@@ -241,4 +234,3 @@ module.exports = {
   update_TN,
   teilnehemr_delete,
 };
-
