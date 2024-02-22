@@ -1,7 +1,17 @@
+/**
+ * @module dozentCRUD_model
+ * @description Dieses Modul enthält Funktionen für die Verwaltung von Dozenten in der Datenbank.
+ */
+
+// Erforderliche Module importieren
 const pool = require("./VSS_DatabaseConnect");
 
-// das ist die get damit  holt mann sein daten von database
-
+/**
+ * @function insert_dozent
+ * @description Fügt einen neuen Dozenten zur Datenbank hinzu.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const insert_dozent = async (req, res) => {
   const {
     vorname,
@@ -25,14 +35,19 @@ const insert_dozent = async (req, res) => {
     const werte = [id, ort, strasse, hause_nr, plz, email, phone];
     await pool.query(kontaktAbfrage, werte);
 
-    res.status(200).send("dozent hinzugefügt");
+    res.status(200).send("Dozent erfolgreich hinzugefügt!");
   } catch (error) {
-    console.error("fehler beim dozent hinzufügen");
-    res.status(500).send("fehler    :(");
+    console.error("Fehler beim Hinzufügen des Dozenten:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
-// get dozent info durch get
+/**
+ * @function getAll_dozent_info
+ * @description Holt alle Dozenteninformationen aus der Datenbank.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const getAll_dozent_info = async (req, res) => {
   try {
     const abfrage = `
@@ -43,16 +58,21 @@ const getAll_dozent_info = async (req, res) => {
 
     res.json(erg.rows);
   } catch (error) {
-    console.error("Fehler beim Abrufen der dozent:", error);
-    res.status(500).send("Server fehler :(");
+    console.error("Fehler beim Abrufen der Dozenten:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
-// hier mit kann man löschen dozen und sein kontakt ddaten updaten  =>  http://localhost:5500/delete_dozent/5
-
+/**
+ * @function delete_dozent
+ * @description Löscht einen Dozenten und die zugehörigen Kontaktinformationen aus der Datenbank.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const delete_dozent = async (req, res) => {
   const { id } = req.params;
   try {
+
 
       kontaktDeleteAbfrage = "DELETE FROM kontakt_daten WHERE fk_dozent_id = $1";
       await pool.query(kontaktDeleteAbfrage, [id]);
@@ -62,11 +82,17 @@ const delete_dozent = async (req, res) => {
 
     res.status(200).send("wurde gelöscht");
   } catch (error) {
-    console.error("fehler beim dozent löschen".error);
-    res.status(500).send("server fehler");
+    console.error("Fehler beim Löschen des Dozenten:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
+/**
+ * @function update_dozent
+ * @description Aktualisiert die Informationen eines Dozenten und die zugehörigen Kontaktinformationen in der Datenbank.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const update_dozent = async (req, res) => {
   const { id } = req.params;
   const {
@@ -81,68 +107,65 @@ const update_dozent = async (req, res) => {
     hause_nr,
   } = req.body;
   try {
-    dozentAbfrage =
+    const dozentAbfrage =
       "UPDATE dozenten SET dozent_vorname = $1, dozent_nachname = $2 , dozent_fachgebiet = $3 WHERE dozent_id = $4";
-    dozentWerte = [vorname, nachname, fachgebiet, id];
-    erg = await pool.query(dozentAbfrage, dozentWerte);
+    const dozentWerte = [vorname, nachname, fachgebiet, id];
+    await pool.query(dozentAbfrage, dozentWerte);
 
-    kontaktAbfrage =
+    const kontaktAbfrage =
       "UPDATE kontakt_daten SET kd_ort = $1, kd_straße = $2, kd_haus_nr = $3, kd_plz = $4, kd_email = $5, kd_phone_nr = $6 WHERE fk_dozent_id = $7";
-    werte = [ort, strasse, hause_nr, plz, email, phone, id];
-    erg2 = await pool.query(kontaktAbfrage, werte);
+    const werte = [ort, strasse, hause_nr, plz, email, phone, id];
+    await pool.query(kontaktAbfrage, werte);
 
-    res.status(200).send("dozent konatkt daten aktualisiert");
+    res.status(200).send("Dozenteninformationen erfolgreich aktualisiert!");
   } catch (error) {
-    console.error("Fehler beim Aktualisieren des Dozenten:");
-    res.status(500).send("Fehler beim Aktualisieren des Dozenten.");
+    console.error("Fehler beim Aktualisieren des Dozenten:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
-// hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen
+/**
+ * @function delete_dozent_kurs
+ * @description Löscht einen Dozenten aus einem bestimmten Kurs.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const delete_dozent_kurs = async (req, res) => {
   const { id, kurs_id } = req.params;
   try {
     const updateQuery = "UPDATE kurse SET fk_dozent_id = $1 WHERE kurs_id = $2";
     await pool.query(updateQuery, [id, kurs_id]);
-    res.status(201).send("Dozent hinzugefügt! :)");
+    res.status(201).send("Dozent erfolgreich entfernt!");
   } catch (error) {
-    console.error("Fehler beim Hinzufügen des Dozenten:", error);
-    res.status(500).send("Server Fehler :(");
+    console.error("Fehler beim Entfernen des Dozenten aus dem Kurs:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
-// const get_one_dozent =  async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const abfrage =
-//       "SELECT * FROM dozenten d INNER JOIN kontakt_daten kd ON d.dozent_id = kd.fk_dozent_id WHERE dozent_id =$1;";
-
-//     const erg = await pool.query(abfrage, [id]);
-//     res.json(erg.rows);
-//     res.status(200);
-//   } catch (error) {
-//     console.error("Fehler beim Abrufen der Dozenten:", error);
-//     res.status(500).send("Server fehler beim Abrufen der Dozenten.");
-//   }
-// };
-
+/**
+ * @function get_one_dozent
+ * @description Holt die Informationen eines bestimmten Dozenten aus der Datenbank.
+ * @param {Object} req - Express Request-Objekt
+ * @param {Object} res - Express Response-Objekt
+ */
 const get_one_dozent = async (req, res) => {
   const { id } = req.params;
   try {
-    selectAbfrage = "SELECT * FROM dozenten WHERE dozent_id = $1";
-    ergVonDozenten = await pool.query(selectAbfrage, [id]);
-    selectAbfrageKD = "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
-    ergVonKontaktdatne = await pool.query(selectAbfrageKD, [id]);
+    const selectAbfrage = "SELECT * FROM dozenten WHERE dozent_id = $1";
+    const ergVonDozenten = await pool.query(selectAbfrage, [id]);
+    const selectAbfrageKD = "SELECT * FROM kontakt_daten WHERE fk_dozent_id = $1";
+    const ergVonKontaktdatne = await pool.query(selectAbfrageKD, [id]);
     res.json({
       dozenten: ergVonDozenten.rows,
       kontaktDaten: ergVonKontaktdatne.rows,
     });
   } catch (error) {
-    console.error("Fehler beim select der dozenten", error);
-    res.status(500).send("hau ab ist doch Server fehler");
+    console.error("Fehler beim Abrufen der Dozenten:", error);
+    res.status(500).send("Interner Serverfehler");
   }
 };
 
+// Module exportieren
 module.exports = {
   insert_dozent,
   getAll_dozent_info,
