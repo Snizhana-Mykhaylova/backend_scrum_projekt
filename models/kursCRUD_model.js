@@ -96,35 +96,34 @@ const getAll_kurs = async (req, res) => {
 const get_one_kurs = async (req, res) => {
   const { id } = req.params;
   try {
-    const abfrage = "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
-    const erg = await pool.query(abfrage, [id]);
+
+    const abfrage =
+      "SELECT k.*, d.* FROM kurse k LEFT JOIN dozenten d ON d.dozent_id = fk_dozent_id WHERE kurs_id = $1;";
+    erg = await pool.query(abfrage, [id]);
 
     res.json({ kurse: erg.rows });
+    return erg;
   } catch (error) {
     console.error("Fehler beim Abrufen eines Kurses:", error);
     res.status(500).send("Interner Serverfehler");
   }
 };
 
-/**
- * @function inserK_buchung
- * @description Fügt einen Teilnehmer zu einem bestimmten Kurs hinzu.
- * @param {Object} req - Express Request-Objekt
- * @param {Object} res - Express Response-Objekt
- */
+// insert kurs zum buchung
 const inserK_buchung = async (req, res) => {
   const { id_k, id } = req.params;
   try {
-    const sqlAbfrage = "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey = $2";
-    const werte1 = [id, id_k];
-    const erg = await pool.query(sqlAbfrage, werte1);
+    sqlAbfarge =
+      "SELECT FROM buchungen WHERE kurs_fkey = $1 AND teilnehmer_fkey =  $1";
+    werte1 = [id, id_k];
+    erg = await pool.query(sqlAbfarge, werte1);
     if (erg != 0) {
-      res.status(400).send("Teilnehmer ist bereits in diesem Kurs");
+      res.status(400).send("teilnehmer ist schon in diesem kurs");
     } else {
-      const sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
-      const werte = [id, id_k];
+      sql = "INSERT INTO buchungen (teilnehmer_fkey,kurs_fkey) VALUES ($1,$2)";
+      werte = [id, id_k];
       await pool.query(sql, werte);
-      res.status(200).send("Kurs wurde erfolgreich gebucht");
+      res.status(200).send("kurs wurde gebucht");
     }
   } catch (error) {
     console.error("Fehler beim Buchen des Kurses:", error);
@@ -132,12 +131,13 @@ const inserK_buchung = async (req, res) => {
   }
 };
 
-// Module exportieren
-module.exports = {
+
+const check = (module.exports = {
   update_kurs,
   getAll_kurs,
   insert_kurs,
   inserK_buchung,
   delete_kurs,
   get_one_kurs,
-};
+
+});

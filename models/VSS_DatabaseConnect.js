@@ -15,5 +15,4 @@ const pool = new Pool({
   port: 5432,
 });
 
-// Exportiert die erstellte 'Pool'-Instanz für den Einsatz in anderen Dateien
 module.exports = pool;
