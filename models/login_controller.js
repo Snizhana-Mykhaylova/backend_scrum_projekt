@@ -34,6 +34,7 @@ const getUserLogin = async (req, res) => {
         const password = row[1];
         const isValid = bcrypt.compareSync(user_password, password);
 
+        // Überprüfung der Benutzeranmeldeinformationen
         if (username && isValid) {
           console.log("Username und Password sind korrekt");
           return res.json({ Message: "Username und Password sind korrekt" });
@@ -66,8 +67,10 @@ const checkUndAddUsersingup = async (req, res) => {
 
     pool.query(getUser, (error, results) => {
       if (results.rows.length) {
+        // Benutzername existiert bereits
         return res.send("Benutzername existiert bereits");
       } else {
+        // Hashen des Passworts und Hinzufügen des neuen Benutzers
         const hashpassword = bcrypt.hashSync(user_password, saltRounds);
 
         pool.query(addUser, [user_name, hashpassword], (error, result) => {
