@@ -64,34 +64,49 @@ const insert_teilnehmer = async (req, res) => {
   try {
     await pool.query("BEGIN");
 
-    const teilnehmerAbfrage =
-      "INSERT INTO teilnehmer (teilnehmer_vorname, teilnehmer_nachname) VALUES ($1, $2) RETURNING teilnehmer_id";
-    const teilnehmerWerte = [vorname, nachname];
-    const teilnehmerErg = await pool.query(teilnehmerAbfrage, teilnehmerWerte);
-    const teilnehmerId = teilnehmerErg.rows[0].teilnehmer_id;
+    // SQL-Abfrage, um zu überprüfen, ob der Teilnehmer bereits existiert
+    const checkAbfrage =
+      "SELECT * FROM teilnehmer WHERE teilnehmer_vorname = $1 AND teilnehmer_nachname = $2";
+    const checkErg = await pool.query(checkAbfrage, [vorname, nachname]);
 
-    const TN_KD_Abfrage =
-      "INSERT INTO kontakt_daten (fk_teilnehmer_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6, $7)";
-    const TN_KD_Werte = [
-      teilnehmerId,
-      ort,
-      strasse,
-      hause_nr,
-      plz,
-      email,
-      phone,
-    ];
-    await pool.query(TN_KD_Abfrage, TN_KD_Werte);
+    // Wenn der Teilnehmer nicht existiert, füge ihn hinzu
+    if (checkErg.rows.length === 0) {
+      const teilnehmerAbfrage =
+        "INSERT INTO teilnehmer (teilnehmer_vorname, teilnehmer_nachname) VALUES ($1, $2) RETURNING teilnehmer_id";
+      const teilnehmerWerte = [vorname, nachname];
+      const teilnehmerErg = await pool.query(
+        teilnehmerAbfrage,
+        teilnehmerWerte
+      );
+      const teilnehmerId = teilnehmerErg.rows[0].teilnehmer_id;
 
-    await pool.query("COMMIT");
+      const TN_KD_Abfrage =
+        "INSERT INTO kontakt_daten (fk_teilnehmer_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6, $7)";
+      const TN_KD_Werte = [
+        teilnehmerId,
+        ort,
+        strasse,
+        hause_nr,
+        plz,
+        email,
+        phone,
+      ];
 
-    res.status(201).send("Teilnehmer hinzugefügt!");
+      await pool.query(TN_KD_Abfrage, TN_KD_Werte);
+      await pool.query("COMMIT");
+
+      res.status(201).send("Teilnehmer hinzugefügt!");
+    } else {
+      console.log("Teilnehmer existiert bereits in der Datenbank");
+      res.status(409).send("Teilnehmer existiert bereits");
+    }
   } catch (error) {
     await pool.query("ROLLBACK");
     console.error("Fehler beim Hinzufügen des Teilnehmers:", error);
     res.status(500).send("Interner Serverfehler");
   }
 };
+
 
 /**
  * @function update_TN
@@ -176,7 +191,7 @@ const tn_buchung_insert = async (req, res) => {
     if (!Array.isArray(teilnehmer_ids) || teilnehmer_ids.length === 0) {
       return res.status(400).send("Teilnehmer-ID(s) ungültig");
     }
-
+    
     await pool.query("BEGIN");
 
     // Durchläuft das Array der Teilnehmer-IDs und fügt jeden Teilnehmer zum Kurs hinzu
@@ -186,7 +201,6 @@ const tn_buchung_insert = async (req, res) => {
       const werte = [tn_id, k_id];
       await pool.query(sql, werte);
     }
-
     await pool.query("COMMIT");
     res.status(200).send("teilnehmer zum gebuchten Kurs hinzugefügt");
   } catch (error) {
@@ -224,8 +238,45 @@ const get_enzelTN_buchung = async (req, res) => {
   }
 };
 
+
+
+const delete_TN_vonKurs = async (req, res) => {
+  const { teilnehmer_ids, k_id } = req.body;
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    // Durchläuft das Array der Teilnehmer-IDs und entfernt jeden Teilnehmer aus dem Kurs
+    for (const tn_id of teilnehmer_ids) {
+      const sql = "UPDATE buchungen SET teilnehmer_fkey = null WHERE kurs_fkey = $1 AND teilnehmer_fkey = $2";
+      const values = [k_id, tn_id];
+      await client.query(sql, values);
+    }
+
+    await client.query("COMMIT");
+    res.status(200).send("Teilnehmer wurde von dem gebuchten Kurs gelöscht");
+  } catch (error) {
+    // Rollback der Transaktion bei einem Fehler und Senden einer Fehlermeldung an den Client
+    await client.query("ROLLBACK");
+    console.error("Fehler beim Löschen der Teilnehmer von dem Kurs:", error);
+    res.status(500).send("Serverfehler");
+  } finally {
+    // Gibt den Datenbank-Client wieder frei
+    client.release();
+  }
+};
+
+
+
+
+
+
+
+
 // Exportiert die Funktionen für den Einsatz in anderen Dateien
 module.exports = {
+  delete_TN_vonKurs,
   get_enzelTN_buchung,
   tn_buchung_insert,
   get_tnEinzel,

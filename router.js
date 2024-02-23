@@ -5,7 +5,7 @@
 
 // Express-Modul importieren
 const express = require("express");
-const { Router } = require("express");
+
 
 // Express-Server erstellen
 const server = express();
@@ -33,6 +33,10 @@ const dozentenCRUD = require("./models/dozentenCRUD_model.js");
 const kursCRUD = require("./models/kursCRUD_model.js");
 const loginCRUD = require("./models/login_controller.js");
 
+
+
+
+
 //#region Teilnehmer
 // das ist die get damit  holt mann sein daten von database mitGET  =>  http://localhost:5500/get_teilnehmer_info
 server.get("/get_teilnehmer_info", teilnehemrCRUD.getAll_teilnehmer);
@@ -58,7 +62,17 @@ server.post("/insert_tn_buchung", teilnehemrCRUD.tn_buchung_insert);
 // GET-Anfrage zum Abrufen der Teilnehmer, die einen bestimmten Kurs besuchen, anhand der Kurs-ID
 server.get("/getTN_Fbuchung/:k_id", teilnehemrCRUD.get_enzelTN_buchung);
 
+
+
+server.put("/delete_TN_vonKurs" , teilnehemrCRUD.delete_TN_vonKurs)
+
+
 //#endregion
+
+
+
+
+
 
 //#region Mitarbeiter
 
@@ -88,6 +102,9 @@ server.get(
 
 //#endregion
 
+
+
+
 //#region Dozent
 
 // POST-Anfrage zum Hinzufügen eines neuen Dozenten
@@ -104,12 +121,18 @@ server.delete("/delete_dozent/:id", dozentenCRUD.delete_dozent);
 
 // // hier mit kann man die einbestimmt dozent in ein bestimmt kurs hinfügen   =>                                                                                                                                                                                     die 6 ist dozent id und 7 die kurs id
 
-server.post("/dozent_intoKurs/:id/:kurs_id", dozentenCRUD.delete_dozent_kurs);
+server.put("/dozent_intoKurs/:id/:kurs_id", dozentenCRUD.insert_dozent_into_kurs);
 
 // GET-Anfrage zum Abrufen der Informationen eines einzelnen Dozenten anhand der ID
 server.get("/get_one_dozent/:id", dozentenCRUD.get_one_dozent);
 
+
+server.put("/update_kurs_dozentDelete/:kurs_id", dozentenCRUD.delete_dozent_kurs);
+
 //#endregion
+
+
+
 
 //#region Kurse
 // damit kann mann alle kurse info aufrufen                      =>    http://localhost:5500/getAll_kurs
@@ -133,6 +156,9 @@ server.post("/inserK_buchung/:id/:id_k", kursCRUD.inserK_buchung);
 
 //#endregion
 
+
+
+
 //#region login
 
 // POST-Anfrage zum Benutzerlogin
@@ -142,6 +168,9 @@ server.post("/login", loginCRUD.getUserLogin);
 server.post("/singup", loginCRUD.checkUndAddUsersingup);
 
 //#endregion
+
+
+
 
 // Server starten und auf dem angegebenen Port lauschen
 server.listen(port, () => {

@@ -25,25 +25,39 @@ const insert_dozent = async (req, res) => {
     email,
     hause_nr,
   } = req.body;
-  try {
-    // Abfrage zum Einfügen des Dozenten in die Datenbank
-    const dozentAbfrage =
-      "INSERT INTO dozenten (dozent_vorname , dozent_nachname , dozent_fachgebiet) VALUES ($1, $2,$3) RETURNING dozent_id";
-    const dozentWerte = [vorname, nachname, fachgebiet];
-    const erg = await pool.query(dozentAbfrage, dozentWerte);
-    const id = erg.rows[0].dozent_id;
-    // Abfrage zum Einfügen der Kontaktinformationen des Dozenten in die Datenbank
-    const kontaktAbfrage =
-      "INSERT INTO kontakt_daten (fk_dozent_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6,$7)";
-    const werte = [id, ort, strasse, hause_nr, plz, email, phone];
-    await pool.query(kontaktAbfrage, werte);
 
-    res.status(200).send("Dozent erfolgreich hinzugefügt!");
+  try {
+    // Überprüfen, ob der Dozent bereits existiert
+    const checkAbfrage =
+      "SELECT * FROM dozenten WHERE dozent_vorname = $1 AND dozent_nachname = $2";
+    const checkErg = await pool.query(checkAbfrage, [vorname, nachname]);
+
+    // Wenn der Dozent nicht existiert, füge ihn hinzu
+    if (checkErg.rows.length === 0) {
+      // Abfrage zum Einfügen des Dozenten in die Datenbank
+      const dozentAbfrage =
+        "INSERT INTO dozenten (dozent_vorname , dozent_nachname , dozent_fachgebiet) VALUES ($1, $2,$3) RETURNING dozent_id";
+      const dozentWerte = [vorname, nachname, fachgebiet];
+      const erg = await pool.query(dozentAbfrage, dozentWerte);
+      const id = erg.rows[0].dozent_id;
+
+      // Abfrage zum Einfügen der Kontaktinformationen des Dozenten in die Datenbank
+      const kontaktAbfrage =
+        "INSERT INTO kontakt_daten (fk_dozent_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6,$7)";
+      const werte = [id, ort, strasse, hause_nr, plz, email, phone];
+      await pool.query(kontaktAbfrage, werte);
+
+      res.status(200).send("Dozent erfolgreich hinzugefügt!");
+    } else {
+      console.log("Dozent existiert bereits in der Datenbank");
+      res.status(409).send("Dozent existiert bereits");
+    }
   } catch (error) {
     console.error("Fehler beim Hinzufügen des Dozenten:", error);
     res.status(500).send("Interner Serverfehler");
   }
 };
+
 
 /**
  * @function getAll_dozent_info
@@ -136,11 +150,12 @@ const update_dozent = async (req, res) => {
  * @param {Object} res - Express Response-Objekt
  */
 const delete_dozent_kurs = async (req, res) => {
-  const { id, kurs_id } = req.params;
+  const {  kurs_id } = req.params;
   try {
     // Abfrage zum Entfernen eines Dozenten aus einem bestimmten Kurs
-    const updateQuery = "UPDATE kurse SET fk_dozent_id = $1 WHERE kurs_id = $2";
-    await pool.query(updateQuery, [id, kurs_id]);
+    const updateQuery = "UPDATE kurse SET fk_dozent_id = $1  WHERE kurs_id = $2";
+    werte = [null , kurs_id]
+    await pool.query(updateQuery, werte);
     res.status(201).send("Dozent erfolgreich entfernt!");
   } catch (error) {
     console.error("Fehler beim Entfernen des Dozenten aus dem Kurs:", error);
@@ -173,6 +188,20 @@ const get_one_dozent = async (req, res) => {
   }
 };
 
+
+const insert_dozent_into_kurs = async(req,res) => {
+  const {id , kurs_id} = req.params;
+  try {
+  sqlAbfarge = "UPDATE kurse SET fk_dozent_id =$1 WHERE kurs_id = $2";
+  werte = [id , kurs_id];
+  const erg = await pool.query(sqlAbfarge ,werte);
+  res.status(200).send("dozen wurde eingefügt")
+  } catch (error) {
+    console.error("fehler beim einfügen");
+    res.status(500).send("server fehler")
+  }
+}
+
 // Module exportieren
 module.exports = {
   insert_dozent,
@@ -181,4 +210,5 @@ module.exports = {
   delete_dozent,
   delete_dozent_kurs,
   get_one_dozent,
+  insert_dozent_into_kurs,
 };

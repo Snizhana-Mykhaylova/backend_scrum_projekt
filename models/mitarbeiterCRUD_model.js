@@ -47,25 +47,37 @@ const insert_mitarbeiter = async (req, res) => {
   } = req.body;
 
   try {
-    // SQL-Abfrage zum Einfügen eines neuen Mitarbeiters
-    const mitarbeiterQuery =
-      "INSERT INTO mitarbeiter (mitarbeiter_vorname, mitarbeiter_nachname, mitarbeiter_position) VALUES ($1, $2, $3) RETURNING mitarbeiter_id";
-    const mitarbeiterValues = [vorname, nachname, position];
-    const erg = await pool.query(mitarbeiterQuery, mitarbeiterValues);
-    const mitarbeiterId = erg.rows[0].mitarbeiter_id;
+    // Überprüfen, ob der Mitarbeiter bereits existiert
+    const checkAbfrage =
+      "SELECT * FROM mitarbeiter WHERE mitarbeiter_vorname = $1 AND mitarbeiter_nachname = $2";
+    const checkErg = await pool.query(checkAbfrage, [vorname, nachname]);
 
-    // SQL-Abfrage zum Einfügen der Kontaktinformationen des neuen Mitarbeiters
-    const kontaktAbfrage =
-      "INSERT INTO kontakt_daten (fk_mitarbeiter_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6,$7)";
-    const werte = [mitarbeiterId, ort, strasse, hause_nr, plz, email, phone];
-    await pool.query(kontaktAbfrage, werte);
+    // Wenn der Mitarbeiter nicht existiert, füge ihn hinzu
+    if (checkErg.rows.length === 0) {
+      // SQL-Abfrage zum Einfügen eines neuen Mitarbeiters
+      const mitarbeiterQuery =
+        "INSERT INTO mitarbeiter (mitarbeiter_vorname, mitarbeiter_nachname, mitarbeiter_position) VALUES ($1, $2, $3) RETURNING mitarbeiter_id";
+      const mitarbeiterValues = [vorname, nachname, position];
+      const erg = await pool.query(mitarbeiterQuery, mitarbeiterValues);
+      const mitarbeiterId = erg.rows[0].mitarbeiter_id;
 
-    res.status(201).send("Mitarbeiter hinzugefügt!");
+      // SQL-Abfrage zum Einfügen der Kontaktinformationen des neuen Mitarbeiters
+      const kontaktAbfrage =
+        "INSERT INTO kontakt_daten (fk_mitarbeiter_id, kd_ort, kd_straße, kd_haus_nr, kd_plz, kd_email, kd_phone_nr) VALUES ($1, $2, $3, $4, $5, $6, $7)";
+      const werte = [mitarbeiterId, ort, strasse, hause_nr, plz, email, phone];
+      await pool.query(kontaktAbfrage, werte);
+
+      res.status(201).send("Mitarbeiter hinzugefügt!");
+    } else {
+      console.log("Mitarbeiter existiert bereits in der Datenbank");
+      res.status(409).send("Mitarbeiter existiert bereits");
+    }
   } catch (error) {
     console.error("Fehler beim Hinzufügen des Mitarbeiters:", error);
     res.status(500).send("Interner Serverfehler");
   }
 };
+
 
 /**
  * @function update_mitarbeiter
