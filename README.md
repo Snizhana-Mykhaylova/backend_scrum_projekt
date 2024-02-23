@@ -1,1 +1,0 @@
-# backend_scrum_projekt
